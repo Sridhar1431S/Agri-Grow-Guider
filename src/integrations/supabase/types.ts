@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      farm_data: {
+        Row: {
+          area_acres: number
+          confidence_score: number | null
+          created_at: string
+          crop_type: string
+          id: string
+          location: string
+          predicted_yield: number | null
+          previous_yield: number | null
+          recommendations: Json | null
+          soil_nitrogen: number | null
+          soil_ph: number | null
+          soil_phosphorus: number | null
+          soil_potassium: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_acres: number
+          confidence_score?: number | null
+          created_at?: string
+          crop_type: string
+          id?: string
+          location: string
+          predicted_yield?: number | null
+          previous_yield?: number | null
+          recommendations?: Json | null
+          soil_nitrogen?: number | null
+          soil_ph?: number | null
+          soil_phosphorus?: number | null
+          soil_potassium?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_acres?: number
+          confidence_score?: number | null
+          created_at?: string
+          crop_type?: string
+          id?: string
+          location?: string
+          predicted_yield?: number | null
+          previous_yield?: number | null
+          recommendations?: Json | null
+          soil_nitrogen?: number | null
+          soil_ph?: number | null
+          soil_phosphorus?: number | null
+          soil_potassium?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          farm_location: string | null
+          farm_size_acres: number | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          preferred_language: string | null
+          primary_crops: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          farm_location?: string | null
+          farm_size_acres?: number | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          preferred_language?: string | null
+          primary_crops?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          farm_location?: string | null
+          farm_size_acres?: number | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          preferred_language?: string | null
+          primary_crops?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weather_data: {
+        Row: {
+          created_at: string
+          humidity: number
+          id: string
+          location: string
+          rainfall: number | null
+          recorded_at: string
+          soil_moisture: number | null
+          temperature: number
+          wind_speed: number | null
+        }
+        Insert: {
+          created_at?: string
+          humidity: number
+          id?: string
+          location: string
+          rainfall?: number | null
+          recorded_at?: string
+          soil_moisture?: number | null
+          temperature: number
+          wind_speed?: number | null
+        }
+        Update: {
+          created_at?: string
+          humidity?: number
+          id?: string
+          location?: string
+          rainfall?: number | null
+          recorded_at?: string
+          soil_moisture?: number | null
+          temperature?: number
+          wind_speed?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Globe, Zap } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-agriculture.jpg";
 
 interface HeroSectionProps {
@@ -9,6 +11,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ language }: HeroSectionProps) {
+  const { user } = useAuth();
   const getTitle = () => {
     switch (language) {
       case "hi":
@@ -67,9 +70,15 @@ export function HeroSection({ language }: HeroSectionProps) {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg" className="bg-white text-primary hover:bg-white/90">
-                {getStartedText()}
-              </Button>
+              {user ? (
+                <Button variant="hero" size="lg" className="bg-white text-primary hover:bg-white/90">
+                  {getStartedText()}
+                </Button>
+              ) : (
+                <Button variant="hero" size="lg" className="bg-white text-primary hover:bg-white/90" asChild>
+                  <Link to="/auth">{getStartedText()}</Link>
+                </Button>
+              )}
               <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
                 <Globe className="w-4 h-4 mr-2" />
                 Demo

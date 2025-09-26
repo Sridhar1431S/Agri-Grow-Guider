@@ -3,13 +3,17 @@ import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FarmDashboard } from "@/components/FarmDashboard";
 import { AIAssistant } from "@/components/AIAssistant";
+import { SoilAnalysis } from "@/components/SoilAnalysis";
+import { CropRecommendation } from "@/components/CropRecommendation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Bot, Home, Settings } from "lucide-react";
+import { BarChart3, Bot, Home, TestTube, Sprout } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { user } = useAuth();
   const [currentLanguage, setCurrentLanguage] = useState("en");
   const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState(user ? "dashboard" : "home");
 
   const toggleVoice = () => {
     setIsVoiceActive(!isVoiceActive);
@@ -19,6 +23,8 @@ const Index = () => {
     const labels = {
       dashboard: { en: "Dashboard", hi: "डैशबोर्ड", or: "ଡ୍ୟାସବୋର୍ଡ" },
       assistant: { en: "AI Assistant", hi: "AI सहायक", or: "AI ସହାୟକ" },
+      soil: { en: "Soil Analysis", hi: "मिट्टी विश्लेषण", or: "ମାଟି ବିଶ୍ଳେଷଣ" },
+      crops: { en: "Crop Recommendations", hi: "फसल सुझाव", or: "ଫସଲ ସୁପାରିଶ" },
     };
     return labels[key]?.[currentLanguage] || labels[key]?.en;
   };
@@ -38,15 +44,27 @@ const Index = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:grid-cols-3">
+          <TabsList className={`grid w-full ${user ? 'grid-cols-5 lg:w-auto lg:grid-cols-5' : 'grid-cols-3 lg:w-auto lg:grid-cols-3'}`}>
             <TabsTrigger value="home" className="flex items-center space-x-2">
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">Home</span>
             </TabsTrigger>
-            <TabsTrigger value="dashboard" className="flex items-center space-x-2">
-              <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">{getTabLabel("dashboard")}</span>
-            </TabsTrigger>
+            {user && (
+              <>
+                <TabsTrigger value="dashboard" className="flex items-center space-x-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">{getTabLabel("dashboard")}</span>
+                </TabsTrigger>
+                <TabsTrigger value="soil" className="flex items-center space-x-2">
+                  <TestTube className="w-4 h-4" />
+                  <span className="hidden sm:inline">{getTabLabel("soil")}</span>
+                </TabsTrigger>
+                <TabsTrigger value="crops" className="flex items-center space-x-2">
+                  <Sprout className="w-4 h-4" />
+                  <span className="hidden sm:inline">{getTabLabel("crops")}</span>
+                </TabsTrigger>
+              </>
+            )}
             <TabsTrigger value="assistant" className="flex items-center space-x-2">
               <Bot className="w-4 h-4" />
               <span className="hidden sm:inline">{getTabLabel("assistant")}</span>
@@ -58,9 +76,21 @@ const Index = () => {
               <HeroSection language={currentLanguage} />
             </TabsContent>
             
-            <TabsContent value="dashboard">
-              <FarmDashboard />
-            </TabsContent>
+            {user && (
+              <>
+                <TabsContent value="dashboard">
+                  <FarmDashboard />
+                </TabsContent>
+                
+                <TabsContent value="soil">
+                  <SoilAnalysis />
+                </TabsContent>
+                
+                <TabsContent value="crops">
+                  <CropRecommendation />
+                </TabsContent>
+              </>
+            )}
             
             <TabsContent value="assistant">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
