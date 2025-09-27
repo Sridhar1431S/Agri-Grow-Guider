@@ -10,6 +10,7 @@ const languages = [
   { code: "en", name: "English", native: "English" },
   { code: "hi", name: "Hindi", native: "हिन्दी" },
   { code: "or", name: "Odia", native: "ଓଡ଼ିଆ" },
+  { code: "te", name: "Telugu", native: "తెలుగు" },
 ];
 
 interface HeaderProps {

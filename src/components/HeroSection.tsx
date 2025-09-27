@@ -18,6 +18,8 @@ export function HeroSection({ language }: HeroSectionProps) {
         return "AI के साथ फसल उत्पादन बढ़ाएं";
       case "or":
         return "AI ସହିତ ଫସଲ ଉତ୍ପାଦନ ବୃଦ୍ଧି କରନ୍ତୁ";
+      case "te":
+        return "AI తో మీ పంట దిగుబడిని పెంచండి";
       default:
         return "Boost Your Crop Yield with AI";
     }
@@ -29,6 +31,8 @@ export function HeroSection({ language }: HeroSectionProps) {
         return "स्मार्ट कृषि के साथ अपनी आय 15% तक बढ़ाएं। मौसम और मिट्टी के डेटा के साथ व्यक्तिगत सलाह पाएं।";
       case "or":
         return "ସ୍ମାର୍ଟ କୃଷି ସହିତ ଆପଣଙ୍କର ଆୟ ୧୫% ପର୍ଯ୍ୟନ୍ତ ବୃଦ୍ଧି କରନ୍ତୁ। ପାଣିପାଗ ଏବଂ ମାଟିର ତଥ୍ୟ ସହିତ ବ୍ୟକ୍ତିଗତ ସଲାହ ପାଆନ୍ତୁ।";
+      case "te":
+        return "స్మార్ట్ వ్యవసాయంతో మీ వ్యవసాయ ఆదాయాన్ని 15% వరకు పెంచుకోండి। వాతావరణం మరియు నేల డేటాతో వ్యక్తిగతీకరించిన సలహాలను పొందండి।";
       default:
         return "Increase your farm income by up to 15% with smart agriculture. Get personalized advice with weather and soil data.";
     }
@@ -40,6 +44,8 @@ export function HeroSection({ language }: HeroSectionProps) {
         return "शुरू करें";
       case "or":
         return "ଆରମ୍ଭ କରନ୍ତୁ";
+      case "te":
+        return "ప్రారంభించండి";
       default:
         return "Get Started";
     }

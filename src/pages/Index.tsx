@@ -21,10 +21,10 @@ const Index = () => {
 
   const getTabLabel = (key: string) => {
     const labels = {
-      dashboard: { en: "Dashboard", hi: "डैशबोर्ड", or: "ଡ୍ୟାସବୋର୍ଡ" },
-      assistant: { en: "AI Assistant", hi: "AI सहायक", or: "AI ସହାୟକ" },
-      soil: { en: "Soil Analysis", hi: "मिट्टी विश्लेषण", or: "ମାଟି ବିଶ୍ଳେଷଣ" },
-      crops: { en: "Crop Recommendations", hi: "फसल सुझाव", or: "ଫସଲ ସୁପାରିଶ" },
+      dashboard: { en: "Dashboard", hi: "डैशबोर्ड", or: "ଡ୍ୟାସବୋର୍ଡ", te: "డాష్‌బోర్డ్" },
+      assistant: { en: "AI Assistant", hi: "AI सहायक", or: "AI ସହାୟକ", te: "AI అసిస్టెంట్" },
+      soil: { en: "Soil Analysis", hi: "मिट्टी विश्लेषण", or: "ମାଟି ବିଶ୍ଳେଷଣ", te: "నేల విశ్లేషణ" },
+      crops: { en: "Crop Recommendations", hi: "फसल सुझाव", or: "ଫସଲ ସୁପାରିଶ", te: "పంట సిఫార్సులు" },
     };
     return labels[key]?.[currentLanguage] || labels[key]?.en;
   };
