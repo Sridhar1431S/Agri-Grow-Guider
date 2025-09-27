@@ -4,6 +4,7 @@ import { Home, Sprout, Bug, MessageCircle, User, Globe } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface NavigationProps {
   currentLanguage: string;
@@ -15,6 +16,7 @@ const languages = [
   { code: "hi", name: "Hindi", native: "हिन्दी" },
   { code: "or", name: "Odia", native: "ଓଡ଼ିଆ" },
   { code: "te", name: "Telugu", native: "తెలుగు" },
+  { code: "ta", name: "Tamil", native: "தமிழ்" },
 ];
 
 export function Navigation({ currentLanguage, onLanguageChange }: NavigationProps) {
@@ -23,10 +25,10 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
 
   const getNavText = (key: string) => {
     const labels = {
-      home: { en: "Home", hi: "होम", or: "ହୋମ", te: "హోమ్" },
-      recommendations: { en: "Recommendations", hi: "सुझाव", or: "ସୁପାରିଶ", te: "సిఫార్సులు" },
-      disease: { en: "Disease Detection", hi: "रोग पहचान", or: "ରୋଗ ଚିହ୍ନଟ", te: "వ్యాధి గుర్తింపు" },
-      chat: { en: "Chat Interface", hi: "चैट इंटरफेस", or: "ଚାଟ୍ ଇଣ୍ଟରଫେସ୍", te: "చాట్ ఇంటర్‌ఫేస్" },
+      home: { en: "Home", hi: "होम", or: "ହୋମ", te: "హోమ్", ta: "முகப்பு" },
+      recommendations: { en: "Recommendations", hi: "सुझाव", or: "ସୁପାରିଶ", te: "సిఫార్సులు", ta: "பரிந்துரைகள்" },
+      disease: { en: "Disease Detection", hi: "रोग पहचान", or: "ରୋଗ ଚିହ୍ନଟ", te: "వ్యాధి గుర్తింపు", ta: "நோய் கண்டறிதல்" },
+      chat: { en: "Chat Interface", hi: "चैट इंटरफेस", or: "ଚାଟ୍ ଇଣ୍ଟରଫେସ୍", te: "చాట్ ఇంటర్‌ఫేస్", ta: "அரட்டை இடைமுகம்" },
     };
     return labels[key]?.[currentLanguage] || labels[key]?.en;
   };
@@ -40,7 +42,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">🌱</span>
             </div>
-            <span className="font-bold text-lg text-foreground">AI-Driven Crop Recommendation System</span>
+            <span className="font-bold text-lg text-foreground">Agri Grow</span>
           </Link>
 
           {/* Navigation Links */}
@@ -100,6 +102,9 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
 
           {/* Right side controls */}
           <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {/* Language Selector */}
             <div className="flex items-center space-x-2">
               <Globe className="w-4 h-4 text-muted-foreground" />

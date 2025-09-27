@@ -4,15 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Send, 
-  Mic, 
-  MicOff, 
-  Bot, 
-  User, 
-  Volume2,
-  VolumeX 
-} from "lucide-react";
+import { Bot, User, Send } from "lucide-react";
+import { VoiceRecorder } from "@/components/VoiceRecorder";
+import { VoiceSynthesis } from "@/components/VoiceSynthesis";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
@@ -38,27 +34,12 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  // Mock responses based on language
-  const getResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes("water") || lowerMessage.includes("irrigation") || lowerMessage.includes("ପାଣି")) {
-      return getIrrigationAdvice(language);
-    } else if (lowerMessage.includes("fertilizer") || lowerMessage.includes("ସାର")) {
-      return getFertilizerAdvice(language);
-    } else if (lowerMessage.includes("pest") || lowerMessage.includes("କୀଟ")) {
-      return getPestAdvice(language);
-    } else if (lowerMessage.includes("weather") || lowerMessage.includes("ପାଣି")) {
-      return getWeatherAdvice(language);
-    } else {
-      return getGeneralAdvice(language);
-    }
-  };
-
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -68,68 +49,49 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: { message: currentInput, language }
+      });
+
+      if (error) {
+        throw error;
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content: getResponse(input),
+        content: data.response || "I'm sorry, I couldn't process your request.",
         timestamp: new Date(),
       };
+      
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive"
+      });
       
-      // Auto-speak response if voice is enabled
-      if (isVoiceEnabled) {
-        speakText(assistantMessage.content);
-      }
-    }, 1000);
-  };
-
-  const toggleListening = () => {
-    if (!isVoiceEnabled) return;
-    
-    if (isListening) {
-      // Stop listening
-      setIsListening(false);
-    } else {
-      // Start listening - mock implementation
-      setIsListening(true);
-      
-      // Simulate voice recognition
-      setTimeout(() => {
-        setInput("How much water should I give to my rice crop?");
-        setIsListening(false);
-      }, 3000);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant",
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again later.",
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const speakText = (text: string) => {
-    if (!isVoiceEnabled || !window.speechSynthesis) return;
-    
-    setIsSpeaking(true);
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Set language based on current selection
-    switch (language) {
-      case "hi":
-        utterance.lang = "hi-IN";
-        break;
-      case "or":
-        utterance.lang = "or-IN";
-        break;
-      default:
-        utterance.lang = "en-US";
-    }
-    
-    utterance.onend = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utterance);
-  };
-
-  const stopSpeaking = () => {
-    window.speechSynthesis.cancel();
-    setIsSpeaking(false);
+  const handleVoiceTranscription = (text: string) => {
+    setInput(text);
   };
 
   useEffect(() => {
@@ -147,15 +109,6 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
             <span>Farm Assistant</span>
           </div>
           <div className="flex items-center space-x-2">
-            {isSpeaking && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={stopSpeaking}
-              >
-                <VolumeX className="w-4 h-4" />
-              </Button>
-            )}
             <Badge variant={isVoiceEnabled ? "default" : "secondary"}>
               {isVoiceEnabled ? "Voice On" : "Voice Off"}
             </Badge>
@@ -199,14 +152,10 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
                 )}
                 
                 {message.type === "assistant" && isVoiceEnabled && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => speakText(message.content)}
-                    className="p-1"
-                  >
-                    <Volume2 className="w-4 h-4" />
-                  </Button>
+                  <VoiceSynthesis 
+                    text={message.content}
+                    onSpeakingChange={setIsSpeaking}
+                  />
                 )}
               </div>
             ))}
@@ -219,27 +168,23 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
               placeholder={getInputPlaceholder(language)}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-              disabled={isListening}
+              onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
+              disabled={isListening || isLoading}
             />
             
             {isVoiceEnabled && (
-              <Button
-                variant={isListening ? "destructive" : "outline"}
-                size="icon"
-                onClick={toggleListening}
-                className="flex-shrink-0"
-              >
-                {isListening ? (
-                  <MicOff className="w-4 h-4" />
-                ) : (
-                  <Mic className="w-4 h-4" />
-                )}
-              </Button>
+              <VoiceRecorder 
+                onTranscription={handleVoiceTranscription}
+                isListening={isListening}
+                onListeningChange={setIsListening}
+              />
             )}
           </div>
           
-          <Button onClick={handleSendMessage} disabled={!input.trim() || isListening}>
+          <Button 
+            onClick={handleSendMessage} 
+            disabled={!input.trim() || isListening || isLoading}
+          >
             <Send className="w-4 h-4" />
           </Button>
         </div>
@@ -248,6 +193,14 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
           <div className="text-center">
             <Badge variant="destructive" className="animate-pulse">
               🎤 Listening... Speak now
+            </Badge>
+          </div>
+        )}
+        
+        {isLoading && (
+          <div className="text-center">
+            <Badge variant="secondary" className="animate-pulse">
+              AI is thinking...
             </Badge>
           </div>
         )}
