@@ -8,10 +8,11 @@ import { CropRecommendation } from "@/components/CropRecommendation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Bot, Home, TestTube, Sprout } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const { user } = useAuth();
-  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const { currentLanguage, setLanguage } = useLanguage();
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [activeTab, setActiveTab] = useState(user ? "dashboard" : "home");
 
@@ -33,7 +34,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header
         currentLanguage={currentLanguage}
-        onLanguageChange={setCurrentLanguage}
+        onLanguageChange={setLanguage}
         isVoiceActive={isVoiceActive}
         onToggleVoice={toggleVoice}
       />

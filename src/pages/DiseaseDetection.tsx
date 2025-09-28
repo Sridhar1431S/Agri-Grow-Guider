@@ -7,12 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Camera, Upload, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-interface DiseaseDetectionProps {
-  language?: string;
-}
-
-export default function DiseaseDetection({ language = "en" }: DiseaseDetectionProps) {
+export default function DiseaseDetection() {
+  const { currentLanguage: language } = useLanguage();
   const [currentLanguage, setCurrentLanguage] = useState(language);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -118,10 +116,7 @@ export default function DiseaseDetection({ language = "en" }: DiseaseDetectionPr
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation 
-        currentLanguage={currentLanguage}
-        onLanguageChange={setCurrentLanguage}
-      />
+      <Navigation hideForGuests />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">

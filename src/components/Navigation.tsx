@@ -5,10 +5,10 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NavigationProps {
-  currentLanguage: string;
-  onLanguageChange: (language: string) => void;
+  hideForGuests?: boolean;
 }
 
 const languages = [
@@ -19,19 +19,15 @@ const languages = [
   { code: "ta", name: "Tamil", native: "தமிழ்" },
 ];
 
-export function Navigation({ currentLanguage, onLanguageChange }: NavigationProps) {
-  const { user } = useAuth();
+export function Navigation({ hideForGuests = false }: NavigationProps) {
+  const { user, signOut } = useAuth();
   const location = useLocation();
+  const { currentLanguage, setLanguage, t } = useLanguage();
 
-  const getNavText = (key: string) => {
-    const labels = {
-      home: { en: "Home", hi: "होम", or: "ହୋମ", te: "హోమ్", ta: "முகப்பு" },
-      recommendations: { en: "Recommendations", hi: "सुझाव", or: "ସୁପାରିଶ", te: "సిఫార్సులు", ta: "பரிந்துரைகள்" },
-      disease: { en: "Disease Detection", hi: "रोग पहचान", or: "ରୋଗ ଚିହ୍ନଟ", te: "వ్యాధి గుర్తింపు", ta: "நோய் கண்டறிதல்" },
-      chat: { en: "Chat Interface", hi: "चैट इंटरफेस", or: "ଚାଟ୍ ଇଣ୍ଟରଫେସ୍", te: "చాట్ ఇంటర్‌ఫేస్", ta: "அரட்டை இடைமுகம்" },
-    };
-    return labels[key]?.[currentLanguage] || labels[key]?.en;
-  };
+  // Hide navigation for non-signed-in users if hideForGuests is true
+  if (hideForGuests && !user) {
+    return null;
+  }
 
   return (
     <nav className="bg-card/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-50 shadow-card">
@@ -42,7 +38,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">🌱</span>
             </div>
-            <span className="font-bold text-lg text-foreground">Agri Grow</span>
+            <span className="font-bold text-lg text-foreground">{t('appTitle')}</span>
           </Link>
 
           {/* Navigation Links */}
@@ -57,7 +53,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
               )}
             >
               <Home className="w-4 h-4" />
-              <span>{getNavText("home")}</span>
+              <span>{t('home')}</span>
             </Link>
             
             <Link
@@ -70,7 +66,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
               )}
             >
               <Sprout className="w-4 h-4" />
-              <span>{getNavText("recommendations")}</span>
+              <span>{t('recommendations')}</span>
             </Link>
             
             <Link
@@ -83,7 +79,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
               )}
             >
               <Bug className="w-4 h-4" />
-              <span>{getNavText("disease")}</span>
+              <span>{t('disease')}</span>
             </Link>
             
             <Link
@@ -96,7 +92,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
               )}
             >
               <MessageCircle className="w-4 h-4" />
-              <span>{getNavText("chat")}</span>
+              <span>{t('chat')}</span>
             </Link>
           </div>
 
@@ -108,7 +104,7 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
             {/* Language Selector */}
             <div className="flex items-center space-x-2">
               <Globe className="w-4 h-4 text-muted-foreground" />
-              <Select value={currentLanguage} onValueChange={onLanguageChange}>
+              <Select value={currentLanguage} onValueChange={setLanguage}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
@@ -123,11 +119,25 @@ export function Navigation({ currentLanguage, onLanguageChange }: NavigationProp
             </div>
 
             {/* User Status */}
-            <div className="flex items-center space-x-2">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {user ? user.email?.split('@')[0] : 'Guest'}
-              </span>
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/profile" className="flex items-center space-x-2">
+                      <User className="w-4 h-4" />
+                      <span className="text-sm">{t('profile')}</span>
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={signOut}>
+                    {t('signOut')}
+                  </Button>
+                </>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Guest</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

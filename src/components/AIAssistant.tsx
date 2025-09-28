@@ -26,7 +26,7 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      type: "assistant",
+      type: "assistant", 
       content: getWelcomeMessage(language),
       timestamp: new Date(),
     },
@@ -106,11 +106,11 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Bot className="w-5 h-5 text-primary" />
-            <span>Farm Assistant</span>
+            <span>{getFarmAssistantText(language)}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Badge variant={isVoiceEnabled ? "default" : "secondary"}>
-              {isVoiceEnabled ? "Voice On" : "Voice Off"}
+              {isVoiceEnabled ? getVoiceOnText(language) : getVoiceOffText(language)}
             </Badge>
           </div>
         </CardTitle>
@@ -192,7 +192,7 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
         {isListening && (
           <div className="text-center">
             <Badge variant="destructive" className="animate-pulse">
-              🎤 Listening... Speak now
+              {getListeningText(language)}
             </Badge>
           </div>
         )}
@@ -200,7 +200,7 @@ export function AIAssistant({ language, isVoiceEnabled }: AIAssistantProps) {
         {isLoading && (
           <div className="text-center">
             <Badge variant="secondary" className="animate-pulse">
-              AI is thinking...
+              {getThinkingText(language)}
             </Badge>
           </div>
         )}
@@ -216,6 +216,10 @@ function getWelcomeMessage(language: string): string {
       return "नमस्ते! मैं आपका कृषि सहायक हूं। फसल, सिंचाई, उर्वरक या मौसम के बारे में कुछ भी पूछें।";
     case "or":
       return "ନମସ୍କାର! ମୁଁ ଆପଣଙ୍କର କୃଷି ସହାୟକ। ଫସଲ, ଜଳସେଚନ, ସାର କିମ୍ବା ପାଣିପାଗ ବିଷୟରେ କିଛି ପଚାରନ୍ତୁ।";
+    case "te":
+      return "హలో! నేను మీ వ్యవసాయ సహాయకుడను. పంటలు, నీటిపారుదల, ఎరువులు లేదా వాతావరణం గురించి ఏదైనా అడగండి।";
+    case "ta":
+      return "வணக்கம்! நான் உங்கள் விவசாய உதவியாளர். பயிர்கள், நீர்ப்பாசனம், உரங்கள் அல்லது வானிலை பற்றி எதுவும் கேட்கவும்।";
     default:
       return "Hello! I'm your farming assistant. Ask me anything about crops, irrigation, fertilizers, or weather.";
   }
@@ -227,8 +231,87 @@ function getInputPlaceholder(language: string): string {
       return "अपना प्रश्न यहाँ लिखें...";
     case "or":
       return "ଆପଣଙ୍କର ପ୍ରଶ୍ନ ଏଠାରେ ଲେଖନ୍ତୁ...";
+    case "te":
+      return "మీ ప్రశ్నను ఇక్కడ టైప్ చేయండి...";
+    case "ta":
+      return "உங்கள் கேள்வியை இங்கே தட்டச்சு செய்யுங்கள்...";
     default:
       return "Type your question here...";
+  }
+}
+
+function getFarmAssistantText(language: string): string {
+  switch (language) {
+    case "hi":
+      return "कृषि सहायक";
+    case "or":
+      return "କୃଷି ସହାୟକ";
+    case "te":
+      return "వ్యవసాయ సహాయకుడు";
+    case "ta":
+      return "பண்ணை உதவியாளர்";
+    default:
+      return "Farm Assistant";
+  }
+}
+
+function getVoiceOnText(language: string): string {
+  switch (language) {
+    case "hi":
+      return "आवाज चालू";
+    case "or":
+      return "ସ୍ୱର ଚାଲୁ";
+    case "te":
+      return "వాయిస్ ఆన్";
+    case "ta":
+      return "குரல் இயக்கம்";
+    default:
+      return "Voice On";
+  }
+}
+
+function getVoiceOffText(language: string): string {
+  switch (language) {
+    case "hi":
+      return "आवाज बंद";
+    case "or":
+      return "ସ୍ୱର ବନ୍ଦ";
+    case "te":
+      return "వాయిస్ ఆఫ్";
+    case "ta":
+      return "குரல் நிறுத்தம்";
+    default:
+      return "Voice Off";
+  }
+}
+
+function getListeningText(language: string): string {
+  switch (language) {
+    case "hi":
+      return "🎤 सुन रहा है... अब बोलें";
+    case "or":
+      return "🎤 ଶୁଣୁଛି... ବର୍ତ୍ତମାନ କୁହନ୍ତୁ";
+    case "te":
+      return "🎤 వింటున్నాను... ఇప్పుడు మాట్లాడండి";
+    case "ta":
+      return "🎤 கேட்கிறது... இப்போது பேசுங்கள்";
+    default:
+      return "🎤 Listening... Speak now";
+  }
+}
+
+function getThinkingText(language: string): string {
+  switch (language) {
+    case "hi":
+      return "AI सोच रहा है...";
+    case "or":
+      return "AI ଚିନ୍ତା କରୁଛି...";
+    case "te":
+      return "AI ఆలోచిస్తున్నాడు...";
+    case "ta":
+      return "AI சிந்தித்துக்கொண்டிருக்கிறது...";
+    default:
+      return "AI is thinking...";
   }
 }
 
