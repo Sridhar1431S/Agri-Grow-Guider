@@ -38,16 +38,16 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Redirect if not authenticated
-  if (!user && !loading) {
-    return <Navigate to="/auth" replace />;
-  }
-
   useEffect(() => {
     if (user) {
       loadProfile();
     }
   }, [user]);
+
+  // Redirect if not authenticated (after all hooks are called)
+  if (!user && !loading) {
+    return <Navigate to="/auth" replace />;
+  }
 
   const loadProfile = async () => {
     if (!user) return;
