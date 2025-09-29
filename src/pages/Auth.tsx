@@ -15,7 +15,7 @@ export default function Auth() {
   const { user, signIn, signUp, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (after all hooks are called)
   if (user && !loading) {
     return <Navigate to="/" replace />;
   }
