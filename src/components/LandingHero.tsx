@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { RainAnimation } from "@/components/RainAnimation";
 import heroImage from "@/assets/hero-agriculture.jpg";
 
 export function LandingHero() {
@@ -18,6 +19,9 @@ export function LandingHero() {
         style={{ backgroundImage: `url(${heroImage})` }}
       />
       <div className="absolute inset-0 bg-black/40" />
+      
+      {/* Rain Animation */}
+      <RainAnimation />
       
       {/* Content */}
       <div className="relative flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-12">
