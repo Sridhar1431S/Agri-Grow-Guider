@@ -1,4 +1,4 @@
-# **Farm Sathi Grow**
+# **Agri Grow**
 
 An AI-powered web application designed to assist farmers with queries, provide multilingual support, and offer voice-enabled interactions.
 
@@ -39,7 +39,7 @@ An AI-powered web application designed to assist farmers with queries, provide m
 
 ## **Introduction**
 
-**Farm Sathi Grow** is a digital companion for farmers. It integrates AI technology to provide quick, conversational, and multilingual support to farmers’ queries. The platform offers voice-enabled interactions, an editable user profile, and a clean user experience with localized language support.
+**AI Grow** is a digital companion for farmers. It integrates AI technology to provide quick, conversational, and multilingual support to farmers’ queries. The platform offers voice-enabled interactions, an editable user profile, and a clean user experience with localized language support.
 
 ---
 
