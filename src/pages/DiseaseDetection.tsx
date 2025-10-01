@@ -8,9 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Camera, Upload, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DiseaseDetection() {
   const { currentLanguage: language } = useLanguage();
+  const { toast } = useToast();
   const [currentLanguage, setCurrentLanguage] = useState(language);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -87,31 +90,37 @@ export default function DiseaseDetection() {
   };
 
   const analyzeImage = async () => {
-    if (!selectedImage) return;
+    if (!selectedImage || !imagePreview) return;
     
     setIsAnalyzing(true);
     
-    // Simulate AI analysis
-    setTimeout(() => {
-      setAnalysis({
-        disease: "Leaf Spot Disease",
-        confidence: 87,
-        severity: "Moderate",
-        treatment: [
-          "Apply copper-based fungicide spray",
-          "Remove affected leaves immediately",
-          "Improve air circulation around plants",
-          "Reduce watering frequency"
-        ],
-        prevention: [
-          "Avoid overhead watering",
-          "Maintain proper plant spacing",
-          "Use disease-resistant varieties",
-          "Apply preventive fungicide treatments"
-        ]
+    try {
+      const { data, error } = await supabase.functions.invoke('disease-detection', {
+        body: {
+          image: imagePreview,
+          language: currentLanguage
+        }
       });
+
+      if (error) throw error;
+
+      if (data?.analysis) {
+        setAnalysis(data.analysis);
+        toast({
+          title: "Analysis Complete",
+          description: "Disease detection completed successfully",
+        });
+      }
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      toast({
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "Failed to analyze image",
+        variant: "destructive",
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   return (
