@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Sprout, LogIn, UserPlus, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { RainAnimation } from '@/components/RainAnimation';
+import heroImage from '@/assets/hero-agriculture.jpg';
 
 export default function Auth() {
   const { user, signIn, signUp, loading } = useAuth();
@@ -124,8 +126,14 @@ export default function Auth() {
 
   if (otpStep) {
     return (
-      <div className="min-h-screen bg-gradient-growth flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen relative flex items-center justify-center p-4">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <RainAnimation />
+        <div className="w-full max-w-md relative z-10">
           <div className="mb-6 text-center">
             <div className="flex items-center justify-center mb-4">
               <Sprout className="w-8 h-8 text-white mr-2" />
@@ -173,8 +181,14 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-growth flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+        style={{ backgroundImage: `url(${heroImage})` }}
+      />
+      <div className="absolute inset-0 bg-black/50" />
+      <RainAnimation />
+      <div className="w-full max-w-md relative z-10">
         <div className="mb-6 text-center">
           <Link to="/" className="inline-flex items-center text-white hover:text-white/80 mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
