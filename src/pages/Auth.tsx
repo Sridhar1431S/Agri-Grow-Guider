@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Sprout, LogIn, UserPlus, ArrowLeft, Phone, Mail } from 'lucide-react';
+import { Sprout, LogIn, UserPlus, ArrowLeft, Phone, Mail, Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { RainAnimation } from '@/components/RainAnimation';
@@ -21,7 +21,10 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [otpStep, setOtpStep] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
   const [otp, setOtp] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
   const { toast } = useToast();
 
   // Redirect if already authenticated (after all hooks are called)
@@ -66,9 +69,10 @@ export default function Auth() {
     
     const formData = new FormData(e.currentTarget);
     const phone = formData.get('phone') as string;
+    const fullPhone = `${countryCode}${phone}`;
     
     const { error } = await supabase.auth.signInWithOtp({
-      phone: phone.startsWith('+91') ? phone : `+91${phone}`,
+      phone: fullPhone,
       options: {
         shouldCreateUser: true
       }
@@ -81,11 +85,32 @@ export default function Auth() {
         variant: "destructive"
       });
     } else {
-      setPhoneNumber(phone);
+      setPhoneNumber(fullPhone);
       setOtpStep(true);
       toast({
         title: "OTP Sent",
         description: "Please check your phone for the verification code.",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleForgotPassword = async (email: string) => {
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Check your email",
+        description: "We've sent you a password reset link.",
       });
     }
     setIsLoading(false);
@@ -96,7 +121,7 @@ export default function Auth() {
     setIsLoading(true);
 
     const { error } = await supabase.auth.verifyOtp({
-      phone: phoneNumber.startsWith('+91') ? phoneNumber : `+91${phoneNumber}`,
+      phone: phoneNumber,
       token: otp,
       type: 'sms'
     });
@@ -236,13 +261,42 @@ export default function Auth() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
-                    <Input
-                      id="signin-password"
-                      name="password"
-                      type="password"
-                      required
-                    />
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="signin-password">Password</Label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const email = (document.getElementById('signin-email') as HTMLInputElement)?.value;
+                          if (email) {
+                            handleForgotPassword(email);
+                          } else {
+                            toast({
+                              title: "Enter your email",
+                              description: "Please enter your email address first.",
+                              variant: "destructive"
+                            });
+                          }
+                        }}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="signin-password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Signing In..." : "Sign In"}
@@ -254,18 +308,31 @@ export default function Auth() {
                 <form onSubmit={handlePhoneSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <div className="flex">
-                      <span className="inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-md">
-                        +91
-                      </span>
+                    <div className="flex gap-2">
+                      <Select value={countryCode} onValueChange={setCountryCode}>
+                        <SelectTrigger className="w-[120px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background z-50">
+                          <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                          <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                          <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                          <SelectItem value="+86">🇨🇳 +86</SelectItem>
+                          <SelectItem value="+81">🇯🇵 +81</SelectItem>
+                          <SelectItem value="+49">🇩🇪 +49</SelectItem>
+                          <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                          <SelectItem value="+61">🇦🇺 +61</SelectItem>
+                          <SelectItem value="+55">🇧🇷 +55</SelectItem>
+                          <SelectItem value="+27">🇿🇦 +27</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Input
                         id="phone"
                         name="phone"
                         type="tel"
                         placeholder="9876543210"
-                        className="rounded-l-none"
-                        pattern="[0-9]{10}"
-                        maxLength={10}
+                        className="flex-1"
+                        pattern="[0-9]{7,15}"
                         required
                       />
                     </div>
@@ -311,13 +378,22 @@ export default function Auth() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      name="password"
-                      type="password"
-                      minLength={6}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="signup-password"
+                        name="password"
+                        type={showSignUpPassword ? "text" : "password"}
+                        minLength={6}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="language">Preferred Language</Label>
