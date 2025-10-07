@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,11 +27,41 @@ export default function Auth() {
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
   const { toast } = useToast();
 
+  const [resendTimer, setResendTimer] = useState(30);
+  const [isResending, setIsResending] = useState(false);
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!otpStep) return;
+    setResendTimer(30);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    intervalRef.current = window.setInterval(() => {
+      setResendTimer((prev) => {
+        if (prev <= 1) {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [otpStep]);
+
   // Redirect if already authenticated (after all hooks are called)
   if (user && !loading) {
     return <Navigate to="/" replace />;
   }
-
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -141,6 +171,46 @@ export default function Auth() {
     setIsLoading(false);
   };
 
+  const handleResendOtp = async () => {
+    if (resendTimer > 0 || !phoneNumber) return;
+    setIsResending(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: phoneNumber,
+      options: { shouldCreateUser: true }
+    });
+
+    if (error) {
+      toast({
+        title: "Resend Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "OTP Sent",
+        description: `We re-sent a code to ${phoneNumber}.`,
+      });
+      setResendTimer(30);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      intervalRef.current = window.setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+              intervalRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    setIsResending(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-growth">
@@ -188,6 +258,15 @@ export default function Auth() {
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading || otp.length !== 6}>
                   {isLoading ? "Verifying..." : "Verify & Sign In"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleResendOtp}
+                  disabled={isResending || resendTimer > 0}
+                >
+                  {isResending ? "Resending..." : resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend OTP"}
                 </Button>
                 <Button 
                   type="button" 
