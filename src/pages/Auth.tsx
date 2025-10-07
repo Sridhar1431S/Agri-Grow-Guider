@@ -20,9 +20,11 @@ export default function Auth() {
   const { user, signIn, signUp, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [otpStep, setOtpStep] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
   const { toast } = useToast();
 
   const [resendTimer, setResendTimer] = useState(30);
@@ -91,6 +93,18 @@ export default function Auth() {
     setIsLoading(false);
   };
 
+  const handlePasswordSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    await signIn(email, password);
+    setIsLoading(false);
+  };
+
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -107,6 +121,33 @@ export default function Auth() {
       last_name: lastName,
       preferred_language: language
     });
+    setIsLoading(false);
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Reset Link Sent",
+        description: "Please check your email for the password reset link.",
+      });
+      setForgotPasswordStep(false);
+    }
     setIsLoading(false);
   };
 
@@ -181,6 +222,60 @@ export default function Auth() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-growth">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  if (forgotPasswordStep) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center p-4">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <RainAnimation />
+        <div className="w-full max-w-md relative z-10">
+          <div className="mb-6 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Sprout className="w-8 h-8 text-white mr-2" />
+              <h1 className="text-2xl font-bold text-white">Agri Grow</h1>
+            </div>
+            <p className="text-white/80">Reset your password</p>
+          </div>
+
+          <Card className="backdrop-blur-sm bg-white/95 border-white/20">
+            <CardHeader className="text-center">
+              <CardTitle>Forgot Password</CardTitle>
+              <CardDescription>Enter your email to receive a reset link</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email">Email</Label>
+                  <Input
+                    id="reset-email"
+                    name="email"
+                    type="email"
+                    placeholder="farmer@example.com"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Sending..." : "Send Reset Link"}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full" 
+                  onClick={() => setForgotPasswordStep(false)}
+                >
+                  Back to Sign In
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -277,11 +372,15 @@ export default function Auth() {
             <CardDescription>Sign in to access your farming dashboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin" className="flex items-center text-xs">
+            <Tabs defaultValue="password" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="password" className="flex items-center text-xs">
                   <LogIn className="w-3 h-3 mr-1" />
-                  Sign In
+                  Password
+                </TabsTrigger>
+                <TabsTrigger value="otp" className="flex items-center text-xs">
+                  <LogIn className="w-3 h-3 mr-1" />
+                  Email OTP
                 </TabsTrigger>
                 <TabsTrigger value="signup" className="flex items-center text-xs">
                   <UserPlus className="w-3 h-3 mr-1" />
@@ -289,12 +388,56 @@ export default function Auth() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="signin" className="space-y-4 mt-6">
+              <TabsContent value="password" className="space-y-4 mt-6">
+                <form onSubmit={handlePasswordSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password-signin-email">Email</Label>
+                    <Input
+                      id="password-signin-email"
+                      name="email"
+                      type="email"
+                      placeholder="farmer@example.com"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password-signin-password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password-signin-password"
+                        name="password"
+                        type={showSignInPassword ? "text" : "password"}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignInPassword(!showSignInPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Signing In..." : "Sign In"}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    className="w-full" 
+                    onClick={() => setForgotPasswordStep(true)}
+                  >
+                    Forgot Password?
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="otp" className="space-y-4 mt-6">
                 <form onSubmit={handleEmailOtpSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
+                    <Label htmlFor="otp-signin-email">Email</Label>
                     <Input
-                      id="signin-email"
+                      id="otp-signin-email"
                       name="email"
                       type="email"
                       placeholder="farmer@example.com"
