@@ -5,6 +5,7 @@ import { FarmDashboard } from "@/components/FarmDashboard";
 import { AIAssistant } from "@/components/AIAssistant";
 import { SoilAnalysis } from "@/components/SoilAnalysis";
 import { CropRecommendation } from "@/components/CropRecommendation";
+import { FarmingBackground } from "@/components/FarmingBackground";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Bot, Home, TestTube, Sprout } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -46,6 +47,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <FarmingBackground />
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">

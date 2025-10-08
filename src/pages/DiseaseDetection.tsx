@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Camera, Upload, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
+import { FarmingBackground } from "@/components/FarmingBackground";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -125,6 +126,7 @@ export default function DiseaseDetection() {
 
   return (
     <div className="min-h-screen bg-background">
+      <FarmingBackground />
       <Navigation hideForGuests />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
